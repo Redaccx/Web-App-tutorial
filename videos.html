@@ -18,8 +18,39 @@
     * { box-sizing: border-box; }
     body { margin:0; background: var(--bg); color: var(--text); line-height: 1.6; }
 
+    /* LOADING ONLY CONTENT */
+    #loading-screen {
+      position: fixed;
+      top: 70px; /* ارتفاع الهيدر */
+      left: 0;
+      width: 100%;
+      height: calc(100% - 70px);
+      background: var(--bg);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 200;
+    }
+
+    .loader {
+      width: 55px;
+      height: 55px;
+      border: 6px solid #ccc;
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    body.loaded #loading-screen {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+    }
+
     /* HEADER */
-    .site-header { background: #fff; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 50; }
+    .site-header { background: #fff; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 500; }
     .header-inner { display:flex; align-items:center; justify-content:space-between; padding: 10px 24px; }
     .logo { font-size: 24px; font-weight: bold; }
     .logo span { color: var(--accent); }
@@ -79,6 +110,11 @@
 </head>
 <body>
 
+<!-- LOADING ONLY CONTENT -->
+<div id="loading-screen">
+  <div class="loader"></div>
+</div>
+
 <!-- HEADER -->
 <header class="site-header">
   <div class="header-inner">
@@ -96,11 +132,9 @@
       <a href="index.html#karting">Karting</a>
       <a href="index.html#events">Weddings</a>
       <a href="index.html#restaurant">Restaurant</a>
-            <a href="videos.html">Videos
-      </a>
+      <a href="videos.html">Videos</a>
       <a href="index.html#contact">Contact</a>
       <a class="btn-cta" href="index.html#booking">Book Now</a>
-  
     </nav>
   </div>
 </header>
@@ -108,61 +142,42 @@
 <div class="container">
   <div class="reels-grid">
 
-    <!-- Reel 1 -->
     <div class="reel-box">
       <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DRhJM20DIFR/?igsh=OWR2NnJzdW1ma2d4" data-instgrm-version="14"></blockquote>
     </div>
 
-    <!-- Reel 2 -->
     <div class="reel-box">
       <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/YYYYYYYYY/" data-instgrm-version="14"></blockquote>
     </div>
 
-    <!-- Reel 3 -->
     <div class="reel-box">
       <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/ZZZZZZZZZ/" data-instgrm-version="14"></blockquote>
     </div>
 
   </div>
   
-   <div class="footer-col">
-     <h3 style="color:var(--accent); margin-bottom:10px;">Contact Us</h3>
-     <p>Phone: +961 79 186 934</p>
-     <p>Email: iaatcountryclub@gmail.com</p>
-     <p>Location: Iaat, Baalbek-Hermel, Lebanon</p>
-   </div>
+  <div class="footer-col">
+    <h3 style="color:var(--accent); margin-bottom:10px;">Contact Us</h3>
+    <p>Phone: +961 79 186 934</p>
+    <p>Email: iaatcountryclub@gmail.com</p>
+    <p>Location: Iaat, Baalbek-Hermel, Lebanon</p>
+  </div>
    
-   <!-- Social Media -->
-   <div class="footer-col">
-     <h3 style="color:var(--accent); margin-bottom:10px;">Follow Us</h3>
-     <div style="display:flex; gap:15px; align-items:center;">
-       
-       <!-- Instagram -->
-       <a href="https://instagram.com/iaatcountryclub" target="_blank" style="font-size:28px; color:#d6249f;">
-         <i class="fab fa-instagram"></i>
-       </a>
-       
-       <!-- Facebook -->
-       <a href="https://facebook.com/iaatcountryclub" target="_blank" style="font-size:28px; color:#1877f2;">
-         <i class="fab fa-facebook"></i>
-       </a>
-       
-       <!-- TikTok -->
-       <a href="https://tiktok.com/@iaatcountryclub" target="_blank" style="font-size:28px; color:#000;">
-         <i class="fab fa-tiktok"></i>
-       </a>
-       
-     </div>
-   </div>
-   
-   </div>
-   
-   <div style="text-align:center; margin-top:25px; padding-top:10px; border-top:1px solid #ddd; color:#777;">
-     © All Rights Reserved — Iaat Country Club
-   </div>
-   </footer>
+  <div class="footer-col">
+    <h3 style="color:var(--accent); margin-bottom:10px;">Follow Us</h3>
+    <div style="display:flex; gap:15px; align-items:center;">
+      <a href="https://instagram.com/iaatcountryclub" target="_blank" style="font-size:28px; color:#d6249f;"><i class="fab fa-instagram"></i></a>
+      <a href="https://facebook.com/iaatcountryclub" target="_blank" style="font-size:28px; color:#1877f2;"><i class="fab fa-facebook"></i></a>
+      <a href="https://tiktok.com/@iaatcountryclub" target="_blank" style="font-size:28px; color:#000;"><i class="fab fa-tiktok"></i></a>
+    </div>
+  </div>
 
-<!-- Instagram Embed Script -->
+</div>
+   
+<div style="text-align:center; margin-top:25px; padding-top:10px; border-top:1px solid #ddd; color:#777;">
+  © All Rights Reserved — Iaat Country Club
+</div>
+
 <script async src="https://www.instagram.com/embed.js"></script>
 
 <script>
@@ -170,6 +185,12 @@
   const mainNav = document.querySelector('.main-nav');
   navToggle.addEventListener('click', () => {
     mainNav.classList.toggle('open');
+  });
+
+  window.addEventListener("load", () => {
+    setTimeout(() => {
+      document.body.classList.add("loaded");
+    }, 600);
   });
 </script>
 
