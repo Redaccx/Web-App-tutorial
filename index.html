@@ -252,7 +252,7 @@ p {
 
     <!-- Text -->
     <div style="flex:1; min-width:280px;">
-      <h2 style="font-size:32px; font-weight:800; color:#000; margin-bottom:10px;">
+      <h2 style="font-size:26px; font-weight:800; color:#000; margin-bottom:10px;">
         Turkish Bath
       </h2>
 
@@ -306,8 +306,8 @@ p {
   <h2>Weddings & Events</h2>
   <p>Complete wedding packages including decoration, catering, lighting & event management.</p>
   <ul>
-    <li>Main Hall — up to 300 guests</li>
-    <li>Small Hall — family gatherings</li>
+    <li>Main Halls — up to 600 guests</li>
+    <li>Small Halls — family gatherings</li>
     <li>Professional event coordination</li>
   </ul>
 </section>
@@ -352,36 +352,52 @@ p {
 <section id="booking" class="container section booking">
   <h2 style="text-align:center; margin-bottom:20px;">Booking Form</h2>
   <form id="bookingForm" class="form-grid">
+
+    <!-- نوع الحجز -->
+    <label>Booking Type
+      <select id="bookingType" name="booking_type" required>
+        <option value="" disabled selected>Select Booking Type</option>
+        <option value="chalet">Chalet</option>
+        <option value="karting">Karting</option>
+        <option value="turkish_bath">Turkish Bath</option>
+        <option value="restaurant">Restaurant</option>
+        <option value="pool">Swimming Pool</option>
+        <option value="wedding_hall">Wedding Hall</option>
+      </select>
+    </label>
+
     <label>Full Name
       <input type="text" name="name" required placeholder="Enter your full name">
     </label>
+
     <label>Phone Number
       <input type="tel" name="phone" required placeholder="Enter your phone number">
     </label>
+
     <label>Email
       <input type="email" name="email" placeholder="Enter your email">
     </label>
-    
-    <!-- Check-In & Check-Out أصغر وحجم متناسق -->
-    <div class="date-row">
+
+    <!-- Check-In & Check-Out (يظهر فقط للشاليه) -->
+    <div id="dateSection" class="date-row" style="display:none;">
       <label class="small-label">Check-In
-        <input type="date" name="checkin" required>
+        <input type="date" name="checkin">
       </label>
       <label class="small-label">Check-Out
-        <input type="date" name="checkout" required>
+        <input type="date" name="checkout">
       </label>
     </div>
 
     <label>Guests
       <input type="number" name="guests" min="1" value="2">
     </label>
+
     <label>Notes
       <textarea name="notes" placeholder="Any special requests?"></textarea>
     </label>
-    
+
     <button id="submitBtn" class="btn btn-primary" type="submit">Send Booking</button>
-    
-    <!-- رسالة التأكيد -->
+
     <p id="confirmationMessage" style="display:none; color:#1f6d3a; text-align:center; font-weight:600; margin-top:12px;">
       Booking received! We will contact you via WhatsApp soon.
     </p>
@@ -406,7 +422,7 @@ label {
   color: #555;
 }
 
-input, textarea {
+input, textarea, select {
   padding: 12px 14px;
   border: 1px solid #ccc;
   border-radius: 8px;
@@ -415,7 +431,7 @@ input, textarea {
   transition: border 0.3s, box-shadow 0.3s;
 }
 
-input:focus, textarea:focus {
+input:focus, textarea:focus, select:focus {
   border-color: #1f6d3a;
   box-shadow: 0 0 6px rgba(31,109,58,0.3);
   outline: none;
@@ -426,24 +442,23 @@ textarea {
   resize: vertical;
 }
 
-/* Check-In & Check-Out أصغر */
 .date-row {
   display: flex;
-  gap: 4px; /* فجوة صغيرة بينهما */
-  justify-content: flex-start; /* يلتصقوا على اليسار */
+  gap: 4px;
+  justify-content: flex-start;
 }
 
 .small-label {
-  width: 264px; /* عرض أصغر */
+  width: 264px;
 }
 
 .small-label input {
-  padding: 6px 8px; /* أصغر من باقي الحقول */
+  padding: 6px 8px;
   font-size: 13px;
 }
 
 #submitBtn {
-  grid-column: 1 / -1; 
+  grid-column: 1 / -1;
   padding: 14px;
   background: #1f6d3a;
   color: #fff;
@@ -478,7 +493,6 @@ textarea {
   100% { transform: scale(1); }
 }
 
-/* Responsive */
 @media (max-width: 600px) {
   .date-row {
     flex-direction: column;
@@ -488,13 +502,24 @@ textarea {
 </style>
 
 <script>
+// إظهار وإخفاء check in/out حسب نوع الحجز
+document.getElementById("bookingType").addEventListener("change", function() {
+  const dateSection = document.getElementById("dateSection");
+
+  if (this.value === "chalet") {
+    dateSection.style.display = "flex";
+    document.querySelector("input[name='checkin']").required = true;
+    document.querySelector("input[name='checkout']").required = true;
+  } else {
+    dateSection.style.display = "none";
+    document.querySelector("input[name='checkin']").required = false;
+    document.querySelector("input[name='checkout']").required = false;
+  }
+});
+
+// Animation + Message
 document.getElementById('bookingForm').addEventListener('submit', function(e){
   e.preventDefault();
-
-  const formData = new FormData(this);
-  const data = {};
-  formData.forEach((value, key) => { data[key] = value; });
-  console.log("Booking data:", data);
 
   const btn = document.getElementById('submitBtn');
   btn.textContent = "Booked!";
@@ -512,7 +537,7 @@ document.getElementById('bookingForm').addEventListener('submit', function(e){
     <!-- Contact -->
     <div class="footer-col">
       <h3 style="color:var(--accent); margin-bottom:10px;">Contact Us</h3>
-      <p>Phone: +961 71 561 934 - 28 379 179</p>
+      <p>Phone: +961 71 561 934 </p>
       <p>Email: iaatcountryclub@gmail.com</p>
       <p>Location: Iaat, Baalbek-Hermel, Lebanon</p>
     </div>
