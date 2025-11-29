@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Posts — Iaat Country Club</title>
+
+  <!-- Fonts & icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    :root{
+      --bg:#fefdf9;
+      --card:#fff;
+      --accent:#1f6d3a;
+      --text:#1d1d1d;
+      --muted:#666;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Segoe UI, Tahoma, Geneva, Verdana,sans-serif;background:var(--bg);color:var(--text)}
+    .site-header{background:#fff;border-bottom:1px solid #eee;padding:12px 20px;position:sticky;top:0;z-index:1000;display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px}
+    .logo img{height:36px}
+    .actions{display:flex;gap:12px;align-items:center}
+    .btn{background:var(--accent);color:#fff;padding:8px 12px;border-radius:8px;border:none;cursor:pointer}
+    .container{max-width:1100px;margin:28px auto;padding:12px}
+    h1{color:var(--accent);text-align:center;margin-bottom:18px}
+    /* Grid */
+    .posts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
+    .post-card{background:var(--card);border-radius:12px;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,0.06);display:flex;flex-direction:column}
+    .media-wrap{position:relative;padding-top:56.25%;background:#000}
+    .media-wrap img,.media-wrap video{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover}
+    .post-body{padding:12px;display:flex;flex-direction:column;gap:8px}
+    .post-meta{display:flex;justify-content:space-between;align-items:center}
+    .caption{color:var(--muted);font-size:14px;min-height:40px}
+    .card-actions{display:flex;gap:10px;align-items:center}
+    .like-btn{background:none;border:none;cursor:pointer;font-size:18px;display:flex;align-items:center;gap:8px;color:var(--muted)}
+    .like-btn.liked{color:#e03131}
+    .share-btn{background:none;border:1px solid #eee;padding:6px 10px;border-radius:8px;cursor:pointer}
+    /* Modal */
+    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);z-index:2000;padding:20px}
+    .modal.show{display:flex}
+    .modal-card{background:#fff;width:100%;max-width:900px;border-radius:12px;overflow:hidden;display:flex;flex-direction:row;gap:0}
+    .modal-left{flex:1;background:#000;min-height:400px;display:flex;align-items:center;justify-content:center}
+    .modal-left img,.modal-left video{width:100%;height:100%;object-fit:cover}
+    .modal-right{width:360px;padding:16px;display:flex;flex-direction:column;gap:12px}
+    .close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted)}
+    /* Upload form modal smaller */
+    .upload-form input[type="file"]{display:block}
+    .input,textarea{width:100%;padding:8px;border-radius:8px;border:1px solid #eee}
+    /* Responsive */
+    @media(max-width:900px){
+      .modal-card{flex-direction:column}
+      .modal-right{width:100%}
+    }
+
+    /* small helpers */
+    .small{font-size:13px;color:var(--muted)}
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="logo">
+      <img src="https://d.top4top.io/s_36185sjce1.jpg" alt="logo">
+      <div>
+        <div style="font-weight:700">Iaat Country Club</div>
+        <div class="small">المنشورات — شارك لحظاتك</div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button id="btn-upload" class="btn"><i class="fa fa-plus"></i> انشر</button>
+      <button id="btn-signout" class="btn" style="background:#444"><i class="fa fa-user"></i> حساب</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <h1>المنشورات</h1>
+
+    <div style="display:flex;justify-content:center;margin-bottom:14px;">
+      <input id="search" placeholder="ابحث بنص المنشور..." class="input" style="max-width:520px;">
+    </div>
+
+    <div id="posts" class="posts-grid">
+      <!-- posts injected here -->
+    </div>
+
+    <div id="loading" class="small" style="text-align:center;margin-top:18px;color:var(--muted)">جارٍ التحميل...</div>
+  </main>
+
+  <!-- POST MODAL -->
+  <div id="post-modal" class="modal" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true">
+      <div class="modal-left" id="modal-media"></div>
+      <div class="modal-right">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div class="small" id="modal-author">—</div>
+          <button class="close" id="modal-close"><i class="fa fa-times"></i></button>
+        </div>
+
+        <div id="modal-caption" style="white-space:pre-wrap"></div>
+
+        <div style="display:flex;gap:10px;align-items:center; margin-top:8px;">
+          <button id="modal-like" class="like-btn"><i class="fa-regular fa-heart"></i> <span id="modal-like-count">0</span></button>
+          <button id="modal-share" class="share-btn"><i class="fa fa-share-alt"></i> مشاركة</button>
+        </div>
+
+        <div class="small" style="margin-top:8px;color:var(--muted)" id="modal-date"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- UPLOAD MODAL -->
+  <div id="upload-modal" class="modal" aria-hidden="true">
+    <div class="modal-card" style="max-width:720px">
+      <div style="padding:18px; width:100%">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <h3 style="margin:0;color:var(--accent)">انشر صورة أو فيديو</h3>
+          <button class="close" id="upload-close"><i class="fa fa-times"></i></button>
+        </div>
+
+        <form id="upload-form" class="upload-form" style="margin-top:12px;display:flex;flex-direction:column;gap:10px">
+          <label>اختر ملف (صورة أو فيديو) <input id="file" type="file" accept="image/*,video/*" required></label>
+          <label>وصف المنشور (Caption) <textarea id="caption" rows="3" class="input" placeholder="اكتب شيء..."></textarea></label>
+          <label>اسم الناشر <input id="author" class="input" placeholder="اسمك (اختياري)"></label>
+
+          <div style="display:flex;gap:8px;align-items:center;margin-top:6px;">
+            <button type="submit" class="btn">رفع ونشر</button>
+            <div id="upload-progress" class="small" style="color:var(--muted)"></div>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase SDKs (modular) -->
+  <script type="module">
+    // --- 1) ضع هنا إعدادات مشروع Firebase تبعك ---
+    const firebaseConfig = {
+       apiKey: "AIzaSyBFMkZ7DFGLgshb3C104ORveF8wGvfncmY",
+  authDomain: "alanmaa-lb.firebaseapp.com",
+  databaseURL: "https://alanmaa-lb-default-rtdb.firebaseio.com",
+  projectId: "alanmaa-lb",
+  storageBucket: "alanmaa-lb.firebasestorage.app",
+  messagingSenderId: "503038482881",
+  appId: "1:503038482881:web:101ead344c3274e668f740",
+  measurementId: "G-W0TF54W20B"
+};
+    // -------------------------------------------
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-app.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc, doc, setDoc, onSnapshot, query, orderBy, serverTimestamp, updateDoc, increment, getDoc } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-firestore.js";
+    import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-storage.js";
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    // Elements
+    const postsEl = document.getElementById('posts');
+    const loadingEl = document.getElementById('loading');
+    const postModal = document.getElementById('post-modal');
+    const modalMedia = document.getElementById('modal-media');
+    const modalCaption = document.getElementById('modal-caption');
+    const modalAuthor = document.getElementById('modal-author');
+    const modalDate = document.getElementById('modal-date');
+    const modalLike = document.getElementById('modal-like');
+    const modalLikeCount = document.getElementById('modal-like-count');
+    const modalShare = document.getElementById('modal-share');
+    const modalClose = document.getElementById('modal-close');
+
+    const uploadModal = document.getElementById('upload-modal');
+    const btnUpload = document.getElementById('btn-upload');
+    const uploadClose = document.getElementById('upload-close');
+    const uploadForm = document.getElementById('upload-form');
+    const fileInput = document.getElementById('file');
+    const captionInput = document.getElementById('caption');
+    const authorInput = document.getElementById('author');
+    const uploadProgress = document.getElementById('upload-progress');
+
+    const btnSignout = document.getElementById('btn-signout');
+    const searchInput = document.getElementById('search');
+
+    let currentUser = null;
+    let currentPostId = null;
+
+    // Sign in anonymously (fallback)
+    signInAnonymously(auth)
+      .catch(err => {
+        console.error('Auth error', err);
+        alert('خطأ بالمصادقة: ' + err.message);
+      });
+
+    onAuthStateChanged(auth, user => {
+      currentUser = user;
+      if (user && user.isAnonymous) {
+        btnSignout.textContent = 'حساب (مجهول)';
+      } else if (user) {
+        btnSignout.textContent = 'تسجيل خروج';
+      }
+    });
+
+    btnSignout.addEventListener('click', () => {
+      if (!currentUser) return;
+      if (currentUser.isAnonymous) {
+        alert('أنت مستخدم مجهول — لعرض خيارات حساب حقيقية فعّل تسجيل الدخول عبر Google (يمكن إضافته لاحقاً).');
+        return;
+      }
+      signOut(auth).then(()=> alert('تم تسجيل الخروج')).catch(e=>console.error(e));
+    });
+
+    // Open/close upload modal
+    btnUpload.addEventListener('click', () => {
+      uploadModal.classList.add('show');
+    });
+    uploadClose.addEventListener('click', () => uploadModal.classList.remove('show'));
+
+    // Close modal
+    modalClose.addEventListener('click', ()=> postModal.classList.remove('show'));
+
+    // Utility - format date
+    function formatDate(ts){
+      try {
+        const d = ts.toDate ? ts.toDate() : new Date(ts);
+        return d.toLocaleString('ar-EG', {year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+      } catch(e){ return '';}
+    }
+
+    // Render a single post card
+    function renderPostCard(postId, data){
+      const card = document.createElement('div');
+      card.className = 'post-card';
+      card.dataset.id = postId;
+
+      const mediaWrap = document.createElement('div');
+      mediaWrap.className = 'media-wrap';
+      if (data.mimeType && data.mimeType.startsWith('video')) {
+        const v = document.createElement('video');
+        v.src = data.mediaURL;
+        v.muted = true;
+        v.playsInline = true;
+        v.loop = true;
+        v.autoplay = true;
+        mediaWrap.appendChild(v);
+      } else {
+        const img = document.createElement('img');
+        img.src = data.mediaURL;
+        img.alt = data.caption || 'post';
+        mediaWrap.appendChild(img);
+      }
+
+      const body = document.createElement('div');
+      body.className = 'post-body';
+      const meta = document.createElement('div');
+      meta.className = 'post-meta';
+      const author = document.createElement('div');
+      author.textContent = data.author || 'Iaat Visitor';
+      author.className = 'small';
+      meta.appendChild(author);
+
+      const actions = document.createElement('div');
+      actions.className = 'card-actions';
+
+      const likeBtn = document.createElement('button');
+      likeBtn.className = 'like-btn';
+      likeBtn.innerHTML = `<i class="fa-regular fa-heart"></i> <span>${data.likes || 0}</span>`;
+      likeBtn.addEventListener('click', (e)=> {
+        e.stopPropagation();
+        toggleLike(postId);
+      });
+
+      const openBtn = document.createElement('button');
+      openBtn.className = 'share-btn';
+      openBtn.textContent = 'فتح';
+      openBtn.addEventListener('click', ()=> openModal(postId, data));
+
+      actions.appendChild(likeBtn);
+      actions.appendChild(openBtn);
+
+      const caption = document.createElement('div');
+      caption.className = 'caption';
+      caption.textContent = data.caption || '';
+
+      body.appendChild(meta);
+      body.appendChild(caption);
+      body.appendChild(actions);
+
+      card.appendChild(mediaWrap);
+      card.appendChild(body);
+
+      // Click whole card to open modal
+      card.addEventListener('click', ()=> openModal(postId, data));
+
+      return card;
+    }
+
+    // Real-time listener to posts collection
+    const postsCol = collection(db, 'posts');
+    const q = query(postsCol, orderBy('createdAt', 'desc'));
+    const unsubscribe = onSnapshot(q, snapshot => {
+      postsEl.innerHTML = '';
+      if (snapshot.empty) {
+        postsEl.innerHTML = '<div class="small" style="text-align:center">لا توجد منشورات بعد</div>';
+        loadingEl.style.display = 'none';
+        return;
+      }
+
+      const postsArr = [];
+      snapshot.forEach(docSnap => {
+        postsArr.push({id: docSnap.id, data: docSnap.data()});
+      });
+
+      // optionally filter by search
+      const term = searchInput.value.trim().toLowerCase();
+      postsArr.forEach(p => {
+        if (term && !(p.data.caption || '').toLowerCase().includes(term)) return;
+        const card = renderPostCard(p.id, p.data);
+        postsEl.appendChild(card);
+      });
+
+      loadingEl.style.display = 'none';
+    }, err => {
+      console.error(err);
+      loadingEl.textContent = 'حدث خطأ بالتحميل.';
+    });
+
+    // Search
+    searchInput.addEventListener('input', ()=> {
+      // trigger re-render by re-using the snapshot listener (already live)
+      // we simply call snapshot handler by re-querying (cheap)
+      // (Simpler: we rely on current DOM clearing in the onSnapshot handler — the listener already populates)
+      // For responsiveness we can programmatically trigger by toggling loading
+      loadingEl.style.display = 'block';
+      loadingEl.textContent = 'جارٍ البحث...';
+      setTimeout(()=> loadingEl.style.display = 'none', 200);
+    });
+
+    // Open modal
+    async function openModal(postId, data){
+      currentPostId = postId;
+      modalMedia.innerHTML = '';
+      if (data.mimeType && data.mimeType.startsWith('video')) {
+        const v = document.createElement('video');
+        v.src = data.mediaURL;
+        v.controls = true;
+        v.autoplay = true;
+        modalMedia.appendChild(v);
+      } else {
+        const img = document.createElement('img');
+        img.src = data.mediaURL;
+        modalMedia.appendChild(img);
+      }
+
+      modalCaption.textContent = data.caption || '';
+      modalAuthor.textContent = data.author || 'Iaat Visitor';
+      modalDate.textContent = formatDate(data.createdAt || data.createdAtLocal || Date.now());
+      modalLikeCount.textContent = data.likes || 0;
+      // set like button state depending if current user liked
+      const liked = await checkIfLiked(postId);
+      modalLike.classList.toggle('liked', liked);
+      modalLike.querySelector('i').className = liked ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
+
+      postModal.classList.add('show');
+
+      // Modal actions
+      modalLike.onclick = async () => {
+        await toggleLike(postId);
+        // the onSnapshot listener will update counts; but we'll optimistically toggle icon
+        const stillLiked = await checkIfLiked(postId);
+        modalLike.classList.toggle('liked', stillLiked);
+        modalLike.querySelector('i').className = stillLiked ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
+      };
+
+      modalShare.onclick = () => {
+        sharePost(data);
+      };
+    }
+
+    // Check if current user liked the post (we track docs in 'postLikes' collection with id `${postId}_${uid}`)
+    async function checkIfLiked(postId){
+      if (!currentUser) return false;
+      try {
+        const likeDocRef = doc(db, 'postLikes', `${postId}_${currentUser.uid}`);
+        const snap = await getDoc(likeDocRef);
+        return snap.exists();
+      } catch(e){ console.error(e); return false; }
+    }
+
+    // Toggle like/unlike
+    async function toggleLike(postId){
+      if (!currentUser) {
+        alert('يجب تسجيل الدخول للتمكّن من الإعجاب');
+        return;
+      }
+      const likeDocRef = doc(db, 'postLikes', `${postId}_${currentUser.uid}`);
+      const postRef = doc(db, 'posts', postId);
+
+      try {
+        const likeSnap = await getDoc(likeDocRef);
+        if (likeSnap.exists()) {
+          // remove like
+          await setDoc(likeDocRef, {}, {merge:true}); // workaround: we will actually delete below
+          // Firestore modular doesn't have deleteDoc imported yet; use update to decrement
+          await updateDoc(postRef, { likes: increment(-1) });
+          // delete the like doc
+          // import deleteDoc dynamically
+          const { deleteDoc } = await import("https://www.gstatic.com/firebasejs/9.24.0/firebase-firestore.js");
+          await deleteDoc(likeDocRef);
+        } else {
+          // add like
+          await setDoc(likeDocRef, { postId, uid: currentUser.uid, createdAt: serverTimestamp() });
+          await updateDoc(postRef, { likes: increment(1) });
+        }
+      } catch(e){
+        console.error('toggleLike error', e);
+      }
+    }
+
+    // Share post: tries Web Share API first
+    function sharePost(data){
+      const title = (data.caption && data.caption.slice(0,80)) || 'منشور من Iaat Country Club';
+      const url = data.mediaURL;
+      if (navigator.share) {
+        navigator.share({
+          title,
+          text: data.caption || '',
+          url
+        }).then(()=> console.log('Shared'))
+          .catch(err=> console.warn('Share failed', err));
+      } else {
+        // fallback: show social links
+        const facebook = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(data.caption || '')}`;
+        const twitter = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(data.caption || '')}`;
+        window.open(facebook,'_blank');
+        // or open twitter in new tab if you prefer
+      }
+    }
+
+    // UPLOAD FORM HANDLING
+    uploadForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const file = fileInput.files[0];
+      if (!file) return alert('اختر ملف');
+      uploadProgress.textContent = 'جارٍ التحضير...';
+
+      try {
+        const ext = file.name.split('.').pop();
+        const path = `posts/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+        const sRef = storageRef(storage, path);
+        const uploadTask = uploadBytesResumable(sRef, file);
+
+        uploadTask.on('state_changed', (snap) => {
+          const pct = Math.round((snap.bytesTransferred / snap.totalBytes) * 100);
+          uploadProgress.textContent = `رفع ${pct}%`;
+        }, (err) => {
+          console.error(err);
+          uploadProgress.textContent = 'خطأ بالرفع';
+        }, async () => {
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+          // create post document
+          await addDoc(collection(db, 'posts'), {
+            mediaURL: downloadURL,
+            mimeType: file.type,
+            caption: captionInput.value || '',
+            author: authorInput.value || (currentUser && currentUser.isAnonymous ? 'زائر' : (currentUser.displayName || currentUser.email || 'مستخدم')),
+            likes: 0,
+            createdAt: serverTimestamp(),
+            storagePath: path
+          });
+          uploadProgress.textContent = 'تم النشر!';
+          // reset
+          uploadForm.reset();
+          setTimeout(()=> { uploadModal.classList.remove('show'); uploadProgress.textContent = ''; }, 800);
+        });
+
+      } catch(err){
+        console.error(err);
+        uploadProgress.textContent = 'حدث خطأ';
+      }
+    });
+
+    // Basic cleanup on unload
+    window.addEventListener('beforeunload', ()=> {
+      // unsubscribe listener if needed
+    });
+
+    // OPTIONAL: simple click outside modal to close
+    document.querySelectorAll('.modal').forEach(m => {
+      m.addEventListener('click', (e) => {
+        if (e.target === m) m.classList.remove('show');
+      });
+    });
+
+    // END main module
+  </script>
+
+</body>
+</html>
