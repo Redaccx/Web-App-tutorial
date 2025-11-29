@@ -172,6 +172,111 @@ p {
 </head>
 <body>
 
+<style>
+  
+
+  /* Overlay intro */
+  #introOverlay {
+    position:fixed; top:0; left:0; width:100%; height:100%;
+    display:flex; justify-content:center; align-items:center; flex-direction:column;
+    z-index:9999; color:#fff; text-align:center; background:#000;
+  }
+
+  #introOverlay video {
+    position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; z-index:0;
+  }
+
+  #introText {
+    position: relative; z-index:1;
+    font-size:18px; font-weight:700; letter-spacing:1px;
+    opacity:0; animation: fadeInText 2s forwards 1s;
+  }
+
+  #fireworks {
+    position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:2;
+    display:none;
+  }
+
+  @keyframes fadeInText { to { opacity:1; } }
+</style>
+</head>
+<body>
+
+<div id="introOverlay">
+  <video id="introVideo" autoplay playsinline>
+    <source src="https://j.top4top.io/m_3620qqygc1.mp4" type="video/mp4">
+  </video>
+  <div id="introText">Welcome to Iaat Country Club</div>
+  <canvas id="fireworks"></canvas>
+</div>
+
+<audio id="bgMusic" loop>
+  <source src="https://files.catbox.moe/0j8r1y.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+const overlay = document.getElementById('introOverlay');
+const video = document.getElementById('introVideo');
+const music = document.getElementById('bgMusic');
+const fireworksCanvas = document.getElementById('fireworks');
+const ctx = fireworksCanvas.getContext('2d');
+
+// تشغيل الموسيقى عند أول نقرة (لتجاوز سياسات المتصفح)
+document.addEventListener('click', function startMusic() {
+  music.play();
+  document.removeEventListener('click', startMusic);
+});
+
+// Canvas setup
+function resizeCanvas(){ fireworksCanvas.width=window.innerWidth; fireworksCanvas.height=window.innerHeight; }
+window.addEventListener('resize', resizeCanvas); resizeCanvas();
+
+// Fireworks particles
+let particles=[];
+function createFirework() {
+  const x = Math.random()*window.innerWidth;
+  const y = Math.random()*window.innerHeight/2 + window.innerHeight/4;
+  const colors = ['#FFD700','#FF4500','#FF69B4','#00BFFF','#ADFF2F'];
+  for(let i=0;i<50;i++){ // أكثر كثافة
+    particles.push({
+      x, y,
+      vx:(Math.random()-0.5)*8,
+      vy:(Math.random()-0.5)*8,
+      alpha:1,
+      color: colors[Math.floor(Math.random()*colors.length)],
+      size:2+Math.random()*4
+    });
+  }
+  // صوت انفجار
+  const audio = new Audio('https://www.soundjay.com/fireworks/firework-01.mp3');
+  audio.volume = 0.3;
+  audio.play();
+}
+
+function animateFireworks(){
+  ctx.clearRect(0,0,fireworksCanvas.width,fireworksCanvas.height);
+  for(let i=particles.length-1;i>=0;i--){
+    const p=particles[i];
+    p.x+=p.vx; p.y+=p.vy; p.alpha-=0.02;
+    ctx.fillStyle=p.color; ctx.globalAlpha=p.alpha;
+    ctx.beginPath(); ctx.arc(p.x,p.y,p.size,0,Math.PI*2); ctx.fill();
+    if(p.alpha<=0){ particles.splice(i,1); }
+  }
+  ctx.globalAlpha=1;
+  requestAnimationFrame(animateFireworks);
+}
+
+// بعد انتهاء الفيديو: عرض المفرقعات + fade out Overlay
+video.addEventListener('ended', ()=>{
+  fireworksCanvas.style.display='block';
+  const fireInterval = setInterval(createFirework, 250);
+  animateFireworks();
+  overlay.style.transition='opacity 2s';
+  overlay.style.opacity=0;
+  setTimeout(()=>{ overlay.style.display='none'; clearInterval(fireInterval); }, 2500);
+});
+</script>
+
 <!-- HEADER -->
 <header class="site-header">
   <div class="container header-inner">
