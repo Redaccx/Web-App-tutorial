@@ -100,7 +100,7 @@ p {
     .hero { background: linear-gradient(90deg, rgba(31,109,58,0.1), transparent); padding: 40px 0; }
     .hero-inner { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
     .hero-text { flex: 1; }
-    .hero-text h1 { font-size: 40px; margin-bottom: 6px; }
+    .hero-text h1 { font-size: 37px; margin-bottom: 6px; }
     .hero-text p { color: var(--muted); margin-bottom: 16px; }
     .btn { padding: 10px 14px; display: inline-block; border-radius: 8px; background: #fff; border: 1px solid #ddd; margin-right: 8px; }
     .btn-primary { background: var(--accent); color: #fff; border: none; }
@@ -172,96 +172,12 @@ p {
 </head>
 <body>
 
-<style>
-
-canvas {
-  position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:9999;
-}
-#welcomeText {
-  position:fixed; top:57%; left:50%;
-  transform:translate(-50%,-50%);
-  color:#000; font-size:20px;
-  font-family: 'Great Vibes', cursive;
-  opacity:0; text-align:center; text-shadow:2px 2px 15px rgba(0,0,0,0.8);
-  z-index:10000;
-  transition: opacity 1.5s ease;
-}
-</style>
-</head>
-<body>
-
-<canvas id="fireworks"></canvas>
-<div id="welcomeText">Welcome to Iaat Country Club</div>
-<audio id="fireworkSound" src="https://j.top4top.io/m_3620ebla41.mp3"></audio>
-
-<script>
-const canvas = document.getElementById('fireworks');
-const ctx = canvas.getContext('2d');
-const sound = document.getElementById('fireworkSound');
-const welcomeText = document.getElementById('welcomeText');
-
-function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
-
-let particles = [];
-
-function createFirework() {
-  const x = Math.random() * canvas.width;
-  const y = Math.random() * canvas.height / 2 + canvas.height / 4;
-  const colors = ['#FFD700','#FF4500','#FF69B4','#00BFFF','#ADFF2F'];
-  for(let i=0;i<50;i++){
-    particles.push({
-      x,y,
-      vx:(Math.random()-0.5)*10,
-      vy:(Math.random()-0.5)*10,
-      alpha:1,
-      color: colors[Math.floor(Math.random()*colors.length)],
-      size:2+Math.random()*4
-    });
-  }
-  sound.currentTime = 0;
-  sound.volume = 0.6;
-  sound.play();
-}
-
-function animate(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  for(let i=particles.length-1;i>=0;i--){
-    const p = particles[i];
-    p.x += p.vx; p.y += p.vy; p.alpha -= 0.02;
-    ctx.fillStyle = p.color; ctx.globalAlpha = p.alpha;
-    ctx.beginPath(); ctx.arc(p.x,p.y,p.size,0,Math.PI*2); ctx.fill();
-    if(p.alpha<=0) particles.splice(i,1);
-  }
-  ctx.globalAlpha=1;
-  requestAnimationFrame(animate);
-}
-
-animate();
-
-// إطلاق 8 مفرقعات
-let count = 0;
-const fireInterval = setInterval(()=>{
-  if(count < 8){ createFirework(); count++; }
-  else {
-    clearInterval(fireInterval);
-    // بعد آخر انفجار، عرض النص الترحيبي
-    setTimeout(()=>{
-      welcomeText.style.opacity = 1;
-      // إخفاء النص بعد 3 ثواني
-      setTimeout(()=>{ welcomeText.style.opacity = 0; }, 3000);
-    }, 500);
-  }
-}, 500);
-</script>
-
 <!-- HEADER -->
 <header class="site-header">
   <div class="container header-inner">
     <div class="logo">
       <img src="https://d.top4top.io/s_36185sjce1.jpg" alt="Iaat Country Club" style="height:40px; vertical-align:middle;">
-      <span>Iaat Country Club</span>
+      <span >Iaat Country Club</span bdnd>
     </div>
     
     <!-- زر الهامبرغر -->
@@ -299,7 +215,7 @@ const fireInterval = setInterval(()=>{
     
     
     <div class="hero-image">
-      <img src="https://a.top4top.io/p_36183r7vd1.jpg" 
+      <img src="https://j.top4top.io/p_3621p11r11.jpg" 
      alt="Iaat Country Club"
      style="width:100%; max-width:500px; border-radius:14px;
             box-shadow:0 10px 30px rgba(0,0,0,0.15);">
@@ -316,10 +232,10 @@ const fireInterval = setInterval(()=>{
 <section id="chalets" class="container section">
   <h2>Chalets & Rooms</h2>
   <div class="cards">
-    <div class="card"><img src="https://d.top4top.io/p_3618pmqft1.jpg" alt=""><div class="card-body"><h3>Large  Chalet</h3><p>up 4 guests, fully equipped kitchen, balcony, 2 bed rooms , salon.</p><div class="price">From $150 / night</div><a class="btn" href="#booking">Book</a></div></div>
+    <div class="card"><img src="https://l.top4top.io/p_3621wd3ob1.jpg" alt=""><div class="card-body"><h3>Large  Chalet</h3><p>up 4 guests, fully equipped kitchen, balcony, 2 bed rooms , salon.</p><div class="price">From $150 / night</div><a class="btn" href="#booking">Book</a></div></div>
     
  
-    <div class="card"><img src="https://c.top4top.io/p_36180ocjx1.jpg" alt=""><div class="card-body"><h3>Small Chalet</h3><p>up 2 guests, fully equipped kitchen, balcony, 1 bed rooms, salon.</p><div class="price"> $110 / night</div><a class="btn" href="#booking">Book</a></div></div>
+    <div class="card"><img src="https://j.top4top.io/p_36210lzeb1.jpg" alt=""><div class="card-body"><h3>Small Chalet</h3><p>up 2 guests, fully equipped kitchen, balcony, 1 bed rooms, salon.</p><div class="price"> $110 / night</div><a class="btn" href="#booking">Book</a></div></div>
   </div></div>
 
   
@@ -375,7 +291,7 @@ const fireInterval = setInterval(()=>{
 
     <!-- Image -->
     <div style="flex:1; min-width:280px; display:flex; justify-content:center;">
-      <img src="https://k.top4top.io/p_36198yobr1.jpg"
+      <img src="https://l.top4top.io/p_3621nwt4q1.jpg"
            alt="Turkish Bath"
            style="width:100%; max-width:480px; border-radius:16px;
                   box-shadow:0 10px 35px rgba(0,0,0,0.18);">
@@ -415,12 +331,24 @@ const fireInterval = setInterval(()=>{
   <h2>Gallery</h2>
   <div class="slider-wrapper" style="position:relative; overflow:hidden;">
     <div class="slider-track" style="display:flex; gap:12px; transition: transform 0.4s ease;">
-      <img src="https://k.top4top.io/p_3618ckfu91.jpg" alt="Pool 1" class="slider-item">
-      <img src="https://j.top4top.io/p_3618m3ilq1.jpg" alt="Pool 2" class="slider-item">
-      <img src="https://i.top4top.io/p_361879cwj1.jpg" alt="Chalet 1" class="slider-item">
-      <img src="https://l.top4top.io/p_3618vgfe61.jpg" alt="Chalet 2" class="slider-item">
-      <img src="https://d.top4top.io/p_3618pmqft1.jpg" alt="Pool 3" class="slider-item">
-      <img src="https://b.top4top.io/p_3618gc58t1.jpg" alt="Pool 4" class="slider-item">
+      <img src="https://e.top4top.io/p_3621f9sfa1.jpg" alt="Pool 1" class="slider-item">
+      <img src="https://l.top4top.io/p_3621zabi21.jpg" alt="Pool 2" class="slider-item">
+      <img src="https://j.top4top.io/p_36217qmcm1.jpg" alt="Chalet 1" class="slider-item">
+      <img src="https://d.top4top.io/p_3621gxyut1.jpg" alt="Chalet 2" class="slider-item">
+      <img src="https://e.top4top.io/p_36214b9kv1.jpg" alt="Pool 3" class="slider-item">
+      <img src="https://l.top4top.io/p_3621u6jun1.jpg" alt="Pool 4" class="slider-item">
+<img src="https://f.top4top.io/p_362151fpq1.jpg" alt="Pool 4" class="slider-item">
+
+<img src="https://f.top4top.io/p_3621cvrkk1.jpg" alt="Pool 4" class="slider-item">
+
+<img src="https://f.top4top.io/p_3621l3ztr1.jpg" alt="Pool 4" class="slider-item">
+
+<img src="https://j.top4top.io/p_36214rpmg1.jpg" alt="Pool 4" class="slider-item">
+
+<img src="https://h.top4top.io/p_362130wod1.jpg" alt="Pool 4" class="slider-item">
+
+<img src="https://f.top4top.io/p_3621sbphx1.jpg" alt="Pool 4" class="slider-item">
+
     </div>
 
     <!-- الأسهم -->
