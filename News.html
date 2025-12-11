@@ -110,7 +110,7 @@ button:hover {
 </head>
 <body>
 
-<!-- صورة البوستر -->
+<!-- Hero Image -->
 <div class="hero"></div>
 
 <div class="container">
@@ -147,7 +147,7 @@ button:hover {
       <button type="submit">Confirm Booking</button>
 
       <p id="confirmationMessage">
-        Booking received! We will contact you on WhatsApp soon.
+        Booking received! We will message you on WhatsApp shortly.
       </p>
 
     </form>
@@ -155,21 +155,19 @@ button:hover {
 </div>
 
 <script>
-// إرسال Formspree + رسالة واتساب
 document.getElementById("nyeForm").addEventListener("submit", async function(e) {
   e.preventDefault();
 
   const form = e.target;
   const data = new FormData(form);
 
-  // جمع البيانات للواتساب
   const name = data.get("name");
   const phone = data.get("phone");
   const email = data.get("email") || "N/A";
   const guests = data.get("guests");
   const notes = data.get("notes") || "No notes";
 
-  const whatsappText =
+  const whatsappMessage =
     `🎉 *New Year's Eve 2026 Booking* %0A%0A` +
     `👤 *Name:* ${name}%0A` +
     `📞 *Phone:* ${phone}%0A` +
@@ -178,11 +176,13 @@ document.getElementById("nyeForm").addEventListener("submit", async function(e) 
     `📝 *Notes:* ${notes}%0A%0A` +
     `✔️ Customer accepted deposit terms.`;
 
-  // رقم الواتساب (غيّره كما تريد)
   const whatsappNumber = "96181112046";
-  const waURL = `https://wa.me/${whatsappNumber}?text=${whatsappText}`;
+  const waURL = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
 
-  // إرسال البيانات إلى Formspree
+  // فتح واتساب أولاً لتجنب البلوك
+  const waWindow = window.open(waURL, "_blank");
+
+  // إرسال Formspree
   const response = await fetch(form.action, {
     method: "POST",
     body: data,
@@ -192,11 +192,9 @@ document.getElementById("nyeForm").addEventListener("submit", async function(e) 
   if (response.ok) {
     document.getElementById("confirmationMessage").style.display = "block";
     form.reset();
-
-    // فتح الواتساب تلقائياً
-    setTimeout(() => {
-      window.open(waURL, "_blank");
-    }, 600);
+  } else {
+    if (waWindow) waWindow.close();
+    alert("Form submission failed. Please try again.");
   }
 });
 </script>
