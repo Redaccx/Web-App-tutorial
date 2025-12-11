@@ -376,6 +376,7 @@ p {
     <label>Booking Type
       <select id="bookingType" name="booking_type" required>
         <option value="" disabled selected>Select Booking Type</option>
+        <option value="new_year">New Year’s Eve 2026</option>
         <option value="chalet">Chalet</option>
         <option value="karting">Karting</option>
         <option value="turkish_bath">Turkish Bath</option>
@@ -397,7 +398,7 @@ p {
       <input type="email" name="email" placeholder="Enter your email">
     </label>
 
-    <!-- Check-In & Check-Out (يظهر فقط للشاليه) -->
+    <!-- يظهر فقط في حال Chalet -->
     <div id="dateSection" class="date-row" style="display:none;">
       <label class="small-label">Check-In
         <input type="date" name="checkin">
@@ -522,24 +523,54 @@ textarea {
 }
 </style>
 
-
 <script>
-// إظهار تواريخ الشاليه عند اختيار Chalet
+// إظهار قسم التاريخ فقط للشاليه
 document.getElementById("bookingType").addEventListener("change", function () {
   const dateSection = document.getElementById("dateSection");
   dateSection.style.display = (this.value === "chalet") ? "flex" : "none";
 });
 
-// إرسال Formspree بدون إعادة تحميل الصفحة
+// إرسال Formspree + WhatsApp بدون Block
 document.getElementById("bookingForm").addEventListener("submit", async function (e) {
   e.preventDefault();
 
   const form = e.target;
-  const formData = new FormData(form);
+  const data = new FormData(form);
 
+  // جمع البيانات
+  const bookingType = data.get("booking_type");
+  const name = data.get("name");
+  const phone = data.get("phone");
+  const email = data.get("email") || "N/A";
+  const guests = data.get("guests");
+  const notes = data.get("notes") || "No notes";
+
+  const checkin = data.get("checkin") || "N/A";
+  const checkout = data.get("checkout") || "N/A";
+
+  // رسالة واتساب
+  const whatsappMsg =
+    `📌 *New Booking*%0A%0A` +
+    `🏷️ *Booking Type:* ${bookingType}%0A` +
+    `👤 *Name:* ${name}%0A` +
+    `📞 *Phone:* ${phone}%0A` +
+    `📧 *Email:* ${email}%0A` +
+    `👥 *Guests:* ${guests}%0A` +
+    `📝 *Notes:* ${notes}%0A%0A` +
+    `📅 *Check-In:* ${checkin}%0A` +
+    `📅 *Check-Out:* ${checkout}`;
+
+  // رقم الواتساب
+  const whatsappNumber = "96171561003";
+
+  // فتح واتساب أولاً (حتى لا يمنعه المتصفح)
+  const whatsappURL = `https://wa.me/${whatsappNumber}?text=${whatsappMsg}`;
+  const waWindow = window.open(whatsappURL, "_blank");
+
+  // إرسال Formspree
   const response = await fetch(form.action, {
     method: "POST",
-    body: formData,
+    body: data,
     headers: { "Accept": "application/json" }
   });
 
@@ -547,9 +578,13 @@ document.getElementById("bookingForm").addEventListener("submit", async function
     document.getElementById("confirmationMessage").style.display = "block";
     form.reset();
     document.getElementById("dateSection").style.display = "none";
+  } else {
+    if (waWindow) waWindow.close();
+    alert("Booking failed. Please try again.");
   }
 });
 </script>
+
 
 <footer id="contact" class="site-footer" style="background:#f8f8f8; padding:40px 0; border-top:1px solid #ddd;">
   <div class="container footer-inner" style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:30px;">
